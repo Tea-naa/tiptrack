@@ -1,0 +1,25 @@
+# Backend Service
+# Internal service for frontend to connect to API
+# Type: ClusterIP (only accessible within cluster)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: tiptrack
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: http
+
+# HOW IT WORKS:
+# Frontend makes requests to: http://backend-service:5000/api/shifts
+# Kubernetes load balances across all backend pods (2 replicas)
+# If one pod dies, traffic automatically goes to healthy pods
+# The backend uses ClusterIP because it shouldn't be directly
+# accessible from the internet. Only the frontend needs to reach it.

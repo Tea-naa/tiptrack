@@ -1,0 +1,89 @@
+# MongoDB Deployment
+# Manages the database pod with health checks and persistent storage
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: tiptrack
+  labels:
+    app: mongodb
+spec:
+  replicas: 1  # Single instance (for StatefulSet pattern, use StatefulSet instead)
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        
+        # Environment variables from Secret
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-password
+        
+        # Mount persistent volume
+        volumeMounts:
+        - name: mongodb-storage
+          mountPath: /data/db  # MongoDB data directory
+        
+        # Resource limits (important for production!)
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Liveness probe: Is MongoDB running?
+        livenessProbe:
+          exec:
+            command:
+            - mongosh
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe: Is MongoDB ready for connections?
+        readinessProbe:
+          exec:
+            command:
+            - mongosh
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+      
+      # Attach the PVC
+      volumes:
+      - name: mongodb-storage
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+
+# KEY CONCEPTS:
+# - replicas: How many copies to run
+# - resources: CPU/memory requests and limits
+# - livenessProbe: Restart pod if this fails
+# - readinessProbe: Stop sending traffic if this fails
+# - volumeMounts: Attach persistent storage

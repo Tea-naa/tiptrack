@@ -1,0 +1,24 @@
+# Backend ConfigMap
+# Stores non-sensitive configuration
+# Use Secret for sensitive data, ConfigMap for everything else
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: tiptrack
+data:
+  # MongoDB connection string (uses service DNS name)
+  MONGODB_URI: "mongodb://admin:tiptrack123@mongodb-service:27017/tiptrack?authSource=admin"
+  
+  # Port the backend runs on
+  PORT: "5000"
+  
+  # Node environment
+  NODE_ENV: "production"
+
+
+
+# WHY mongodb-service?
+# Kubernetes DNS: Any service named "mongodb-service" in the same
+# namespace can be reached at "mongodb-service:27017"

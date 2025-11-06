@@ -1,0 +1,32 @@
+# Frontend Service
+# Exposes the React app to the outside world
+# Type: LoadBalancer (external access)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: tiptrack
+spec:
+  type: LoadBalancer # Expose service to external world (in Minikube, use 'minikube service')
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+    
+  
+# HOW TO ACCESS:
+# In Minikube: minikube service frontend-service -n tiptrack
+# In cloud (AWS/GCP/Azure): Gets a real external IP automatically
+
+# NOTES:
+#  I used LoadBalancer for the frontend so users can access the app,
+#  but ClusterIP for backend/database to keep them internal and secure.
+#  This follows the principle of least privilege.
+
+# PRODUCTION ALTERNATIVE:
+# In production, you'd typically use an Ingress controller instead
+# of LoadBalancer for better control over routing and SSL/TLS

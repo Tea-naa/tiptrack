@@ -1,0 +1,72 @@
+# Backend Deployment
+# Runs Node.js API with health checks and auto-restart
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: tiptrack
+  labels:
+    app: backend
+spec:
+  replicas: 2  # Run 2 instances for high availability
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: tiptrack-backend:latest  # Your Docker image
+        imagePullPolicy: Never  # For Minikube (don't pull from Docker Hub)
+        ports:
+        - containerPort: 5000
+          name: http
+        
+        # Load environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: backend-config
+        
+        # Resource management
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        
+        # Liveness probe: Uses /health endpoint you created!
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe: Ensures backend is ready before sending traffic
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+
+
+#  Implemented health probes using the /health endpoint.
+#  Liveness restarts unhealthy pods, readiness controls traffic routing.
+#  This ensures zero-downtime deployments and automatic recovery.
+
+# WHY 2 REPLICAS?
+# - High availability: If one pod crashes, traffic goes to the other
+# - Load distribution: Requests spread across both pods
+# - Rolling updates: Can update one while other serves traffic

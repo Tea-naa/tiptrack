@@ -1,0 +1,38 @@
+# ==============================================
+# DOCKER-COMPOSE: Run all 3 services
+# Services:
+#   mongodb  → database (with login)
+#   backend  → API (connects to mongo)
+#   frontend → React app (talks to backend)
+# ==============================================
+
+services:
+  mongodb:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: tiptrack123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  backend:
+    build: ./backend
+    environment:
+      MONGODB_URI: mongodb://admin:tiptrack123@mongodb:27017/tiptrack?authSource=admin
+      PORT: 5000
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:

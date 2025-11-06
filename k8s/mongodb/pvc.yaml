@@ -1,0 +1,17 @@
+# MongoDB PersistentVolumeClaim: Creates the storage request (PersistentVolumeClaim)
+# Ensures tup data survives pod restarts 
+# WITHOUT THIS: All data lost when pod dies
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: tiptrack
+spec:
+  accessModes:
+    - ReadWriteOnce  # Can be mounted by one pod at a time
+  resources:
+    requests:
+      storage: 1Gi    # 1 gigabyte storage for tip data
+  # In Minikube, uses 'standard' storage class automatically
+  # In cloud (AWS/GCP/Azure), specify storage class for SSD/HDD

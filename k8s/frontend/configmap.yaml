@@ -1,0 +1,19 @@
+# Frontend ConfigMap
+# Stores API URL for the React app
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: tiptrack
+data:
+  # API URL that frontend uses to connect to backend
+  VITE_API_URL: "http://backend-service:5000/api/shifts"
+
+# NOTE: In Minikube, this won't work directly from browser
+# because browser can't resolve "backend-service"
+# We'll use Minikube tunneling or NodePort for actual access
+
+# PRODUCTION SETUP:
+# In real production, you'd use an Ingress controller and
+# set this to your actual domain: https://api.tiptrack.com/api/shifts

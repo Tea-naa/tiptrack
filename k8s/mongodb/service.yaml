@@ -1,0 +1,23 @@
+# MongoDB Service
+# Provides stable DNS name for backend to connect to database
+# Type: ClusterIP (internal only - NOT exposed to internet)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: tiptrack
+spec:
+  type: ClusterIP  # Internal only
+  selector:
+    app: mongodb  # Routes to pods with label app=mongodb
+  ports:
+    - port: 27017  
+      targetPort: 27017  
+      protocol: TCP
+      name: mongodb
+  
+# HOW IT WORKS:
+# Backend connects to: mongodb-service:27017
+# Kubernetes DNS resolves this to the MongoDB pod IP
+# Traffic stays INSIDE the cluster (secure!)

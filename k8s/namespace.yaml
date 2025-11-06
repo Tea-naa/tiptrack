@@ -1,0 +1,15 @@
+# Namespace
+# Logical grouping for all TipTrack resources
+# Keeps things organized and isolated
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tiptrack
+
+
+# WHY USE NAMESPACES?
+# - Organization: Group related resources
+# - Isolation: Separate dev/staging/prod
+# - Security: Apply policies per namespace
+# - Resource quotas: Limit CPU/memory per namespace

@@ -1,0 +1,61 @@
+# Frontend Deployment
+# Runs React app served by Nginx
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: tiptrack
+  labels:
+    app: frontend
+spec:
+  replicas: 2  # 2 instances for high availability
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: tiptrack-frontend:latest
+        imagePullPolicy: Never  # For Minikube
+        ports:
+        - containerPort: 80
+          name: http
+        
+        # Resource limits
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        
+        # Liveness probe: Is Nginx running?
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Readiness probe: Is frontend ready to serve traffic?
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+
+# FRONTEND RESOURCE NOTES:
+# - Frontend uses less resources than backend (just serving static files)
+# - Nginx is very efficient
+# - 2 replicas provide redundancy
