@@ -1,4 +1,8 @@
 # TipTrack 💰
+![Dashboard](screenshot-dashboard.png)
+![Calendar](screenshot-calendar.png)
+![Add Shift](screenshot-add-shift.png)
+![Tax-Free Tracker](screenshot-tax.png)
 
 _Built by a bartender, for bartenders._
 
