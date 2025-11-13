@@ -1762,5 +1762,14 @@ body {
 }
 
 
+/* Logout button styling */
+.logout-btn {
+  color: #ef4444 !important;
+  /* Red text for logout */
+}
 
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  /* Light red background on hover */
+}
 

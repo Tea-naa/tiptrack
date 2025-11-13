@@ -21,6 +21,7 @@ A **full-stack MERN application** that helps service industry workers:
 - Auto-calculate **tax withholding** based on your rate
 - Stay under the **$25,000 tax-free threshold** (2024 IRS law)
 - View earnings by day, week, month, and year
+- **Secure user authentication** with JWT tokens
 
 Built by a bartender — **battle-tested on real shifts**.  
 Deployed with **Docker + Kubernetes** to showcase **DevOps/SRE skills**.
@@ -29,6 +30,9 @@ Deployed with **Docker + Kubernetes** to showcase **DevOps/SRE skills**.
 
 ## 🎯 Key Features
 
+- ✅ **User Authentication** - Secure signup/login with JWT tokens (90-day expiration)
+- ✅ **Beautiful Animated UI** - Neon-style login with gradient borders and smooth animations
+- ✅ **Password Security** - Bcrypt hashing with show/hide toggle
 - ✅ **Add/Edit/Delete Shifts** - Track every shift you work
 - ✅ **Cash vs Credit Tips** - Separate tracking or total entry
 - ✅ **Tax Calculator** - Auto-calculates withholding (claimed × rate)
@@ -45,7 +49,7 @@ Deployed with **Docker + Kubernetes** to showcase **DevOps/SRE skills**.
 ```
 User → Frontend (LoadBalancer)
         ↓
-     Backend (ClusterIP)
+     Backend (ClusterIP) + Auth Routes
         ↓
     MongoDB + PVC (ClusterIP)
 ```
@@ -55,6 +59,7 @@ User → Frontend (LoadBalancer)
 - **3 Services:** Frontend (LoadBalancer), Backend (ClusterIP), MongoDB (ClusterIP)
 - **1 PVC:** Persistent storage for MongoDB data
 - **Health Probes:** Auto-healing and traffic management
+- **Authentication:** JWT-based secure login system
 
 ---
 
@@ -63,12 +68,15 @@ User → Frontend (LoadBalancer)
 ### Frontend
 - React 18 (with Vite)
 - Axios for API calls
-- Lucide-React icons
-- Modern dark theme UI
+- Lucide-React icons (including eye toggle for passwords)
+- Modern animated neon theme UI
+- JWT token storage (localStorage)
 
 ### Backend
 - Node.js + Express
 - MongoDB + Mongoose
+- **bcryptjs** - Password hashing
+- **jsonwebtoken** - JWT authentication
 - CORS enabled
 - RESTful API design
 
@@ -101,11 +109,26 @@ User → Frontend (LoadBalancer)
    # Backend
    cd backend
    npm install
-   npm install cors  # ⚠️ REQUIRED for API to work!
+   npm install cors bcryptjs jsonwebtoken  # ⚠️ REQUIRED for API and auth!
    
    # Frontend
    cd ../frontend
    npm install
+   npm install lucide-react  # ⚠️ REQUIRED for eye icon and UI!
+   ```
+
+3. **Set up environment variables:**
+   
+   **Backend** (`backend/.env`):
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/tiptrack
+   PORT=5000
+   JWT_SECRET=your-super-secret-key-change-this-in-production
+   ```
+   
+   **Frontend** (`frontend/.env`):
+   ```env
+   VITE_API_URL=http://localhost:5000/api/shifts
    ```
 
 ### Deploy to Kubernetes
@@ -192,7 +215,34 @@ kubectl port-forward -n tiptrack service/frontend-service 3000:80
 http://localhost:3000
 ```
 
+**First time?** Create an account on the animated login screen!
+
 **✅ Ports never change! Always localhost:3000**
+
+---
+
+## 🔐 Authentication System
+
+### Features
+- **Secure signup/login** with JWT tokens
+- **Password hashing** with bcrypt (10 salt rounds)
+- **90-day token expiration** (configurable)
+- **Show/hide password toggle** with eye icon
+- **Beautiful animated login UI** with neon effects
+- **Error handling** with shake animations
+
+### How It Works
+1. User signs up → Password hashed → JWT token created
+2. Token saved in localStorage (90-day expiration)
+3. Each API request includes token in Authorization header
+4. Backend verifies token before processing requests
+
+### Security Best Practices Implemented
+- ✅ Passwords never stored as plain text
+- ✅ JWT tokens expire after 90 days
+- ✅ Tokens include user ID only (minimal payload)
+- ✅ HTTPS recommended for production
+- ✅ Token stored in localStorage (not cookies for simplicity)
 
 ---
 
@@ -202,13 +252,20 @@ http://localhost:3000
 tiptrack/
 ├── backend/                # Node.js + Express API
 │   ├── models/            # Mongoose schemas
+│   │   ├── Shift.js      # Shift data model
+│   │   └── User.js       # User authentication model
 │   ├── routes/            # API endpoints
+│   │   ├── shifts.js     # Shift CRUD operations
+│   │   └── auth.js       # Login/signup endpoints
 │   ├── server.js          # Main server file
 │   └── Dockerfile         # Backend container image
 ├── frontend/              # React + Vite app
 │   ├── src/
 │   │   ├── components/   # React components
-│   │   └── services/     # API client
+│   │   │   └── Login.jsx # Animated login component
+│   │   ├── services/     # API client
+│   │   └── styles/       # CSS files
+│   │       └── Login.css # Neon animated styles
 │   └── Dockerfile        # Frontend container image
 └── k8s/                   # Kubernetes manifests
     ├── namespace.yaml     # tiptrack namespace
@@ -221,7 +278,16 @@ tiptrack/
 
 ## 🔌 API Endpoints
 
-**Base URL:** `http://localhost:5000/api/shifts`
+**Base URL:** `http://localhost:5000`
+
+### Authentication Routes
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/signup` | Create new user account |
+| POST | `/api/auth/login` | Login and get JWT token |
+
+### Shift Routes
+**Base:** `/api/shifts`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -244,6 +310,7 @@ tiptrack/
 ```env
 MONGODB_URI=mongodb://mongodb-service:27017/tiptrack
 PORT=5000
+JWT_SECRET=your-super-secret-key-change-this-in-production
 ```
 
 **Frontend** (`frontend/.env`):
@@ -266,6 +333,16 @@ kubectl logs <pod-name> -n tiptrack
 
 # Check health endpoint
 curl http://localhost:5000/health
+
+# Test signup
+curl -X POST http://localhost:5000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"test123"}'
+
+# Test login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"test123"}'
 
 # Get service URLs
 minikube service list -n tiptrack
@@ -290,6 +367,16 @@ kubectl get svc -n tiptrack
 
 # Check MongoDB connection
 kubectl logs <backend-pod> -n tiptrack | grep MongoDB
+
+# Check auth routes are loaded
+kubectl logs <backend-pod> -n tiptrack | grep auth
+```
+
+**Port conflicts?**
+```bash
+# If port 5000 is in use (macOS Control Center):
+# Change backend/.env to PORT=5001
+# Update frontend API calls to use 5001
 ```
 
 ---
@@ -299,7 +386,7 @@ kubectl logs <backend-pod> -n tiptrack | grep MongoDB
 - ✅ **Multi-container deployment** - Frontend, Backend, MongoDB
 - ✅ **Service discovery** - Services communicate via DNS
 - ✅ **Persistent storage** - PVC for MongoDB data
-- ✅ **Secrets management** - MongoDB credentials
+- ✅ **Secrets management** - MongoDB credentials + JWT secrets
 - ✅ **ConfigMaps** - Environment configuration
 - ✅ **Health probes** - Liveness and readiness checks
 - ✅ **Rolling updates** - Zero-downtime deployments
@@ -319,6 +406,10 @@ minikube stop
 
 # Delete Minikube cluster
 minikube delete
+
+# Clear browser data (logout)
+# Open browser console (F12) and run:
+localStorage.clear()
 ```
 
 ---
@@ -333,9 +424,12 @@ MIT License - feel free to use this project for learning or your portfolio!
 
 Built as a portfolio project to demonstrate:
 - Full-stack development (MERN)
+- User authentication with JWT
+- Modern animated UI design
 - Containerization (Docker)
 - Container orchestration (Kubernetes)
 - DevOps/SRE practices
+- Security best practices (password hashing, token expiration)
 
 **Perfect for bootcamp grads looking to break into SRE roles!** 🚀
 
@@ -349,10 +443,22 @@ Built as a portfolio project to demonstrate:
 
 ---
 
+## 🎨 Design Credits
+
+Login page inspired by modern neon UI designs with:
+- Animated gradient borders
+- Glass-morphism effects
+- Smooth hover animations
+- Floating background elements
+
+---
+
 **Questions? Issues?** Open an issue or reach out! 💪
 
+---
 
-Author
-Tina Bajwa
-Built as a hands-on DevOps learning journey.
-“Track your tips. Automate your taxes. Learn Kubernetes.”
+## 👤 Author
+
+**Tina Bajwa**  
+Built as a hands-on DevOps learning journey.  
+*"Track your tips. Automate your taxes. Learn Kubernetes."*

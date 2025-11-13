@@ -1,0 +1,346 @@
+/* =======================
+   TIPTRACK LOGIN 
+   ======================= */
+
+/* ========== CONTAINER & BACKGROUND ========== */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #242424 100%);
+  /* TipTrack dark gradient */
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated floating circles in background */
+.login-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+  /* Blue to green gradient */
+  filter: blur(60px);
+  animation: float 15s infinite ease-in-out;
+}
+
+.login-bg-circle-1 {
+  width: 300px;
+  height: 300px;
+  top: -150px;
+  left: -150px;
+  animation-delay: 0s;
+}
+
+.login-bg-circle-2 {
+  width: 400px;
+  height: 400px;
+  bottom: -200px;
+  right: -200px;
+  animation-delay: 5s;
+}
+
+.login-bg-circle-3 {
+  width: 250px;
+  height: 250px;
+  top: 50%;
+  left: 50%;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, -50px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+/* ========== CARD WITH HOVER EXPAND ========== */
+.login-card {
+  background: rgba(26, 26, 26, 0.95);
+  /* TipTrack dark background */
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  animation: slideUp 0.6s ease-out;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Hover expand transition */
+}
+
+/* HOVER EXPAND EFFECT */
+.login-card:hover {
+  transform: scale(1.02);
+  /* Slightly expand on hover */
+  box-shadow: 0 30px 80px rgba(59, 130, 246, 0.3);
+  /* Blue glow on hover */
+}
+
+/* Animated rotating gradient border */
+.login-card-border {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(90deg, #3b82f6, #10b981, #3b82f6);
+  /* Blue → Green → Blue (TipTrack colors!) */
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotateBorder 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotateBorder {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== LOGO ========== */
+.login-logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-logo-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.login-logo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.login-logo .tagline {
+  color: #a0a0a0;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+/* ========== WELCOME TEXT ========== */
+.login-welcome {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-welcome h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.login-welcome p {
+  font-size: 14px;
+  color: #a0a0a0;
+  /* TipTrack muted text */
+}
+
+/* ========== FORM ========== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-input-group {
+  position: relative;
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(36, 36, 36, 0.8);
+  /* TipTrack tertiary background */
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  /* TipTrack blue accent */
+  background: rgba(36, 36, 36, 0.95);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  /* Blue glow */
+}
+
+.login-input::placeholder {
+  color: #a0a0a0;
+}
+
+/* Eye icon button */
+.login-eye-button {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a0a0a0;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.login-eye-button:hover {
+  color: #3b82f6;
+  /* Blue on hover */
+}
+
+/* ========== SUBMIT BUTTON WITH GLOW ========== */
+.login-button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #3b82f6, #10b981);
+  /* TipTrack gradient */
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  /* Blue glow */
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2563eb, #0ea77a);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.login-button:hover::before {
+  opacity: 1;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+  /* Stronger glow on hover */
+}
+
+.login-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+/* ========== FORGOT PASSWORD ========== */
+.login-forgot {
+  background: none;
+  border: none;
+  color: #10b981;
+  /* TipTrack green */
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+  margin-top: 8px;
+}
+
+.login-forgot:hover {
+  color: #3bb992;
+  text-decoration: underline;
+}
+
+/* ========== FOOTER (Sign Up Toggle) ========== */
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.login-toggle {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  /* TipTrack blue */
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: color 0.2s ease;
+}
+
+.login-toggle:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+/* ========== ERROR MESSAGE ========== */
+.login-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 16px;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 40px 30px;
+  }
+  
+  .login-logo h2 {
+    font-size: 28px;
+  }
+  
+  .login-welcome h1 {
+    font-size: 22px;
+  }
+}

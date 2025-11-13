@@ -6,6 +6,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const shiftsRoutes = require('./routes/shifts');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;  // use PORT from .env, or 5000 as default
@@ -51,6 +52,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/shifts', shiftsRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

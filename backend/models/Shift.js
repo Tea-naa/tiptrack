@@ -11,6 +11,13 @@ const shiftSchema = new mongoose.Schema(
       type: Date,
       required: true,  // Must have a date - can't save without it
     },
+
+    // NEW - Tie shift to a specific user
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,  // References a User document
+      ref: 'User',                           // Links to User model
+      required: true                         // Every shift MUST have an owner
+    },
     
     // How many hours you worked
     hoursWorked: {

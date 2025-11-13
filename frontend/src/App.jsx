@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import Dashboard from './components/Dashboard';     
 import AddShiftForm from './components/AddShiftForm'; 
 import ShiftCalendar from './components/ShiftCalendar';  
-import { Menu, X, PiggyBank } from 'lucide-react';               
+import { Menu, X, PiggyBank } from 'lucide-react';  
+import Login from './components/Login';             
 
 function App() {
   // ======================================
@@ -14,6 +15,9 @@ function App() {
 
   // Controls which page is active: "dashboard" or "shifts"
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Track logged-in user (null = not logged in)
+  const [user, setUser] = useState(null);
 
   // Controls visibility of the Add Shift modal form
   const [showAddForm, setShowAddForm] = useState(false);
@@ -28,6 +32,15 @@ function App() {
   // Target month for calendar navigation (null = current month)
   const [targetMonth, setTargetMonth] = useState(null);
 
+
+  // ======================================
+  // 🔹 AUTH CHECK
+  // ======================================
+  // If user is not logged in, show login page
+  if (!user) {
+    return <Login onLoginSuccess={setUser} />;
+  }
+  
   // ======================================
   // 🔹 EVENT HANDLERS
   // ======================================
@@ -49,6 +62,13 @@ function App() {
     setActiveTab('shifts'); // Switch to calendar view
   };
 
+  // Logout handler - clears tokens and returns to login page
+  const handleLogout = () => {
+    localStorage.removeItem('token');       // Remove JWT token from browser
+    localStorage.removeItem('username');    // Remove username from browser
+    setUser(null);                          // Clear user state (triggers login page)
+  };
+
   // ======================================
   // 🔹 APP STRUCTURE / UI RENDER
   // ======================================
@@ -58,79 +78,98 @@ function App() {
       {/* ===================== */}
       {/* HEADER / NAVIGATION BAR */}
       {/* ===================== */}
-<header className="app-header">
-  <div className="header-content">
+      <header className="app-header">
+        <div className="header-content">
 
-    {/* ─── LOGO ─── */}
-    <div className="logo">
-      <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <PiggyBank size={26} color="#4ecca3" strokeWidth={2} />
-        <span style={{ fontWeight: 700 }}>TipTrack</span>
-      </h1>
-      <p className="tagline">Track Your Tips, Plan Your Taxes</p>
-    </div>
+          {/* ─── LOGO ─── */}
+          <div className="logo">
+            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <PiggyBank size={26} color="#4ecca3" strokeWidth={2} />
+              <span style={{ fontWeight: 700 }}>TipTrack</span>
+            </h1>
+            <p className="tagline">Track Your Tips, Plan Your Taxes</p>
+          </div>
 
-    {/* ─── DESKTOP NAV LINKS (hidden on mobile) ─── */}
-    <nav className="nav desktop-nav">
-      <button
-        className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-        onClick={() => {
-          setActiveTab('dashboard');
-          setRefreshKey(prev => prev + 1);
-        }}
-      >
-        Dashboard
-      </button>
+          {/* ─── DESKTOP NAV LINKS (hidden on mobile) ─── */}
+          <nav className="nav desktop-nav">
+            <button
+              className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('dashboard');
+                setRefreshKey(prev => prev + 1);
+              }}
+            >
+              Dashboard
+            </button>
 
-      <button
-        className={`nav-btn ${activeTab === 'shifts' ? 'active' : ''}`}
-        onClick={() => setActiveTab('shifts')}
-      >
-        All Shifts
-      </button>
-    </nav>
+            <button
+              className={`nav-btn ${activeTab === 'shifts' ? 'active' : ''}`}
+              onClick={() => setActiveTab('shifts')}
+            >
+              All Shifts
+            </button>
 
-    {/* ─── + ADD SHIFT BUTTON (always visible) ─── */}
-    <button
-      className="btn-add-shift"
-      onClick={() => setShowAddForm(true)}
-    >
-      + Add Shift
-    </button>
+            {/* ─── LOGOUT BUTTON ─── */}
+            <button
+              className="nav-btn logout-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </nav>
 
-    {/* ─── MOBILE MENU TOGGLE (visible only on ≤768px) ─── */}
-    <button
-      className="mobile-menu-toggle"
-      onClick={() => setMenuOpen(!menuOpen)}
-    >
-      {menuOpen ? <X size={24} /> : <Menu size={24} />}
-    </button>
-  </div>
+          {/* ─── + ADD SHIFT BUTTON (always visible) ─── */}
+          <button
+            className="btn-add-shift"
+            onClick={() => setShowAddForm(true)}
+          >
+            + Add Shift
+          </button>
 
-  {/* ─── MOBILE SLIDE-IN MENU ─── */}
-  <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-    <button
-      className={`mobile-menu-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-      onClick={() => {
-        setActiveTab('dashboard');
-        setMenuOpen(false);
-        setRefreshKey(prev => prev + 1);
-      }}
-    >
-      Dashboard
-    </button>
+          {/* ─── MOBILE MENU TOGGLE (visible only on ≤768px) ─── */}
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
-    <button
-      className={`mobile-menu-item ${activeTab === 'shifts' ? 'active' : ''}`}
-      onClick={() => {
-        setActiveTab('shifts');
-        setMenuOpen(false);
-      }}
-    >
-      All Shifts
-    </button>
-  </div>
-</header>
+        {/* ─── MOBILE SLIDE-IN MENU ─── */}
+        <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+          <button
+            className={`mobile-menu-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('dashboard');
+              setMenuOpen(false);
+              setRefreshKey(prev => prev + 1);
+            }}
+          >
+            Dashboard
+          </button>
+
+          <button
+            className={`mobile-menu-item ${activeTab === 'shifts' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('shifts');
+              setMenuOpen(false);
+            }}
+          >
+            All Shifts
+          </button>
+
+          {/* ─── LOGOUT BUTTON (mobile menu) ─── */}
+          <button
+            className="mobile-menu-item logout-btn"
+            onClick={() => {
+              handleLogout();
+              setMenuOpen(false);
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
 
       {/* ===================== */}
       {/* MAIN CONTENT AREA */}
@@ -186,15 +225,19 @@ export default App;
 
 
 // HOW THIS APP WORKS:
-// 1. App.jsx renders Dashboard OR ShiftList based on activeTab
-// 2. User clicks "Add Shift" → modal opens with AddShiftForm
-// 3. User submits form → handleShiftAdded() runs
-// 4. refreshKey increments → triggers re-fetch in Dashboard and ShiftList
-// 5. Data refreshes automatically!
+// 1. App.jsx checks if user is logged in (if not, shows Login component)
+// 2. Once logged in, renders Dashboard OR ShiftCalendar based on activeTab
+// 3. User clicks "Add Shift" → modal opens with AddShiftForm
+// 4. User submits form → handleShiftAdded() runs
+// 5. refreshKey increments → triggers re-fetch in Dashboard and ShiftList
+// 6. Data refreshes automatically!
+// 7. User clicks "Logout" → clears tokens → returns to login page
 
 // DETAILED FLOW:
-// - The backend saves the new shift to MongoDB
+// - User logs in → JWT token saved in localStorage
+// - The backend saves new shifts to MongoDB
 // - handleShiftAdded() increments refreshKey
-// - React re-renders Dashboard and ShiftList
+// - React re-renders Dashboard and ShiftCalendar
 // - Both components call their APIs again to fetch the latest data
 // - The user instantly sees updated totals, averages, and tax info
+// - Logout clears localStorage and resets user state
