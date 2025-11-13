@@ -35,10 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 const cleanMongoURI = (process.env.MONGODB_URI || '').trim();
 
 mongoose
-  .connect(cleanMongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(cleanMongoURI)
+  
   .then(() => {
     console.log("✅ Connected to MongoDB successfully");
   })
