@@ -30,15 +30,24 @@ app.use(express.urlencoded({ extended: true }));
 // ====================
 // DATABASE CONNECTION 
 // ====================
+
+// Clean up the Mongo URI just in case Railway added spaces or newlines
+const cleanMongoURI = (process.env.MONGODB_URI || '').trim();
+
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(cleanMongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    console.log(`✅ Connected to MongoDB successfully`);
+    console.log("✅ Connected to MongoDB successfully");
   })
   .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
+    console.error("❌ MongoDB connection error:", error.message);
+    console.error("MONGODB_URI value being used:", cleanMongoURI);
     process.exit(1);
   });
+
 
 // ====================
 // ROUTES
