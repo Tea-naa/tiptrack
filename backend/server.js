@@ -81,11 +81,12 @@ app.use((err, req, res, next) => {
 // ====================
 // START SERVER
 // ====================
-app.listen(PORT, () => {
-  console.log(`🚀 TipTrack API server running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`💰 API base URL: http://localhost:${PORT}/api/shifts`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 TipTrack API server running on http://0.0.0.0:${PORT}`);
+  console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`💰 API base URL: http://0.0.0.0:${PORT}/api/shifts`);
 });
+
 
 // ====================
 // GRACEFUL SHUTDOWN
