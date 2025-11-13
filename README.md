@@ -1,9 +1,11 @@
 # TipTrack 💰
-![Dashboard](screenshot-dashboard.png)
-![Calendar](screenshot-calendar.png)
-![Add Shift](screenshot-add-shift.png)
-![Tax Tracker Over $25K](screenshot-overtax.png)
-![Tax-Free Tracker](screenshot-tax.png)
+<div align="center">
+  <img src="screenshot-dashboard.png" width="600" alt="Dashboard">
+  <img src="screenshot-overtax.png" width="600" alt="Tax Tracker Over $25K">
+  <img src="screenshot-calendar.png" width="600" alt="Calendar View">
+  <img src="screenshot-add-shift.png" width="600" alt="Add Shift Form">
+  <img src="screenshot-tax.png" width="600" alt="Tax-Free Tracker">
+</div>
 
 _Built by a bartender, for bartenders._
 
