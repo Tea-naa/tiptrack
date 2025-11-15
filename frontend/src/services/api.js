@@ -1,7 +1,7 @@
 // API Service - All backend communication with JWT authentication
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/shifts';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 // Create axios instance with auth interceptor
 const api = axios.create({
