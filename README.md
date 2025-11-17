@@ -7,15 +7,15 @@
   <img src="screenshot-tax.png" width="600" alt="Tax-Free Tracker">
 </div>
 
+# TipTrack 💰
+
 _Built by a bartender, for bartenders._
 
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?logo=node.js&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-4EA94B?logo=mongodb&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-326CE5?logo=kubernetes&logoColor=white)
 ![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white)
-![Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?logo=railway&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-326CE5?logo=kubernetes&logoColor=white)
 
 ---
 
@@ -29,40 +29,12 @@ A **full-stack MERN application** that helps service industry workers:
 - **Secure user authentication** with JWT tokens
 
 Built by a bartender — **battle-tested on real shifts**.  
-
-**Deployed TWO ways** to demonstrate both traditional DevOps and modern cloud skills:
-- 🎯 **Kubernetes** (Minikube) - Container orchestration, self-healing, persistent storage
-- ☁️ **Railway + Vercel** - Modern cloud platforms, CI/CD, microservices
-
----
-
-## 🚀 Live Demo
-
-**Production (Cloud):**
-- **Frontend:** https://tiptrack.vercel.app  
-- **Backend API:** https://tiptrack-production.up.railway.app
-
-**Local (Kubernetes):**
-- See [Kubernetes Deployment](#-kubernetes-deployment) section below
-
-*Try the live app! Create an account and track your first shift.* 💪
+Deployed with **Docker + Kubernetes** to showcase **DevOps/SRE skills**.
 
 ---
 
 ## 🏗️ Architecture
 
-### Cloud Architecture (Production)
-```
-User Browser
-    ↓
-Frontend (Vercel CDN) - Global edge network
-    ↓
-Backend API (Railway) - Node.js + Express
-    ↓
-MongoDB (Railway) - Persistent database
-```
-
-### Kubernetes Architecture (Portfolio Showcase)
 ```
 User → Frontend (LoadBalancer)
         ↓
@@ -76,7 +48,7 @@ User → Frontend (LoadBalancer)
 - **3 Services:** Frontend (LoadBalancer), Backend (ClusterIP), MongoDB (ClusterIP)
 - **1 PVC:** Persistent storage for MongoDB data
 - **Health Probes:** Liveness and readiness checks
-- **Auto-healing:** Kubernetes restarts failed pods automatically
+- **Self-Healing:** Kubernetes restarts failed pods automatically
 
 ---
 
@@ -86,10 +58,11 @@ User → Frontend (LoadBalancer)
 - ✅ **Beautiful Animated UI** - Neon-style login with gradient borders and smooth animations
 - ✅ **Password Security** - Bcrypt hashing with show/hide toggle
 - ✅ **Add/Edit/Delete Shifts** - Track every shift you work
+- ✅ **Cash vs Credit Tips** - Separate tracking or total entry
 - ✅ **Tax Calculator** - Auto-calculates withholding (claimed × rate)
 - ✅ **Dashboard** - Today, week, month, and total stats
 - ✅ **$25K Tax-Free Tracker** - Know exactly how much is tax-free
-- ✅ **Persistent Data** - MongoDB with persistent volume (Kubernetes) or managed DB (Railway)
+- ✅ **Persistent Data** - MongoDB with persistent volume
 - ✅ **Self-Healing** - Kubernetes auto-restarts failed pods
 - ✅ **Health Probes** - Liveness and readiness checks
 
@@ -112,46 +85,15 @@ User → Frontend (LoadBalancer)
 - CORS enabled
 - RESTful API design
 
-### DevOps & Deployment
-- **Docker** (multi-stage builds, containerization)
-- **Kubernetes** (Deployments, Services, ConfigMaps, Secrets, PVCs)
-- **Minikube** (local Kubernetes cluster)
-- **Railway** (backend + MongoDB hosting)
-- **Vercel** (frontend CDN deployment)
-- **Nixpacks** (Railway build system)
-- **GitHub** (version control, CI/CD triggers)
+### DevOps
+- Docker (multi-stage builds)
+- Kubernetes (Deployments, Services, ConfigMaps, Secrets)
+- Minikube (local development cluster)
+- Health checks (liveness + readiness probes)
 
 ---
 
-## 🚀 Deployment Options
-
-Choose your deployment method based on what you want to demonstrate:
-
-### Option 1: Kubernetes (Show SRE/DevOps Skills) 🎯
-
-**Use this to demonstrate:**
-- Container orchestration
-- Service discovery
-- Persistent storage
-- Health checks and self-healing
-- ConfigMaps and Secrets management
-
-[Jump to Kubernetes Deployment Guide](#-kubernetes-deployment)
-
-### Option 2: Cloud Platforms (Production Ready) ☁️
-
-**Use this to demonstrate:**
-- Modern cloud architecture
-- CI/CD pipelines
-- Microservices deployment
-- Managed services
-- Zero-downtime deployments
-
-[Jump to Cloud Deployment Guide](#%EF%B8%8F-cloud-deployment-railway--vercel)
-
----
-
-## 🎯 Kubernetes Deployment
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -180,7 +122,7 @@ Choose your deployment method based on what you want to demonstrate:
    npm install lucide-react  # ⚠️ REQUIRED for eye icon and UI!
    ```
 
-3. **Set up environment variables (for local K8s):**
+3. **Set up environment variables:**
    
    **Backend** (`backend/.env`):
    ```env
@@ -191,21 +133,22 @@ Choose your deployment method based on what you want to demonstrate:
    
    **Frontend** (`frontend/.env`):
    ```env
-   VITE_API_URL=http://localhost:5000/api/shifts
+   VITE_API_URL=http://localhost:5000
    ```
 
-### Quick Deploy to Kubernetes
+### Deploy to Kubernetes
 
+**Quick version:**
 ```bash
 # 1. Start Minikube
 minikube start --cpus=4 --memory=4096 --driver=docker
 
-# 2. Build images in Minikube's Docker environment
+# 2. Build images in Minikube
 eval $(minikube docker-env)
 cd backend && docker build -t tiptrack-backend:latest .
 cd ../frontend && docker build -t tiptrack-frontend:latest .
 
-# 3. Deploy to Kubernetes
+# 3. Deploy
 cd ..
 kubectl apply -f k8s/
 
@@ -213,21 +156,22 @@ kubectl apply -f k8s/
 kubectl get pods -n tiptrack -w
 # Press Ctrl+C when all show Running
 
-# 5. Access the app
-# See Daily Usage section below
+# 5. Access the app (see Daily Usage section below)
 ```
 
-### Daily Usage (Kubernetes)
+---
 
-**Every time you want to use the Kubernetes deployment:**
+## 📄 Daily Usage
 
-#### Step 1: Check Minikube
+**Every time you want to use the app:**
+
+### Step 1: Check Minikube
 ```bash
 minikube status
 # If stopped: minikube start
 ```
 
-#### Step 2: Open 2 Terminals (Keep Both Running!)
+### Step 2: Open 2 Terminals (Keep Both Running!)
 
 **Terminal 1 (Backend):**
 ```bash
@@ -239,153 +183,20 @@ kubectl port-forward -n tiptrack service/backend-service 5000:5000
 kubectl port-forward -n tiptrack service/frontend-service 3000:80
 ```
 
-#### Step 3: Open Browser
+### Step 3: Open Browser
 ```
 http://localhost:3000
 ```
 
+**First time?** Create an account on the animated login screen!
+
 **✅ Ports never change! Always localhost:3000**
-
-### Kubernetes Features Demonstrated
-
-- ✅ **Multi-container deployment** - Frontend, Backend, MongoDB
-- ✅ **Service discovery** - Services communicate via DNS
-- ✅ **Persistent storage** - PVC for MongoDB data
-- ✅ **Secrets management** - MongoDB credentials + JWT secrets
-- ✅ **ConfigMaps** - Environment configuration
-- ✅ **Health probes** - Liveness and readiness checks
-- ✅ **Rolling updates** - Zero-downtime deployments
-- ✅ **Auto-scaling** - Multiple replicas for high availability
-- ✅ **Self-healing** - Automatic pod restarts
-
-### Kubernetes Testing
-
-```bash
-# Check all resources
-kubectl get all -n tiptrack
-
-# View pod logs
-kubectl logs <pod-name> -n tiptrack
-
-# Check health endpoint
-curl http://localhost:5000/health
-
-# Test signup
-curl -X POST http://localhost:5000/api/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"test123"}'
-
-# Get service URLs
-minikube service list -n tiptrack
-```
-
-### Kubernetes Cleanup
-
-```bash
-# Delete everything
-kubectl delete namespace tiptrack
-
-# Stop Minikube
-minikube stop
-
-# Delete Minikube cluster (optional)
-minikube delete
-```
-
----
-
-## ☁️ Cloud Deployment (Railway + Vercel)
-
-### Architecture
-
-**Modern microservices approach:**
-- **Frontend** (Vercel) - React app on global CDN
-- **Backend** (Railway) - Node.js API + MongoDB
-- **Auto-deployment** - Push to GitHub = automatic deploy
-
-### Backend Setup (Railway)
-
-1. Create Railway account
-2. New Project → Deploy from GitHub
-3. Connect `tiptrack` repository
-4. Set root directory: `backend`
-5. Add environment variables:
-   - `MONGODB_URI` (provided by Railway MongoDB)
-   - `JWT_SECRET` (your secret key)
-   - `PORT` (auto-assigned)
-6. Railway auto-deploys on git push
-
-### Frontend Setup (Vercel)
-
-1. Create Vercel account
-2. Import Git Repository
-3. Select `tiptrack` repository
-4. Set root directory: `frontend`
-5. Framework: Vite (auto-detected)
-6. Add environment variable:
-   - `VITE_API_URL` = `https://tiptrack-production.up.railway.app`
-7. Deploy!
-
-### Cloud Features Demonstrated
-
-- ✅ **Microservices architecture** - Separate frontend/backend
-- ✅ **CI/CD pipelines** - Auto-deploy from GitHub
-- ✅ **Managed services** - No server management needed
-- ✅ **Global CDN** - Fast worldwide with Vercel
-- ✅ **Health monitoring** - Built-in platform monitoring
-- ✅ **Zero-downtime deploys** - Automatic blue/green deployment
-- ✅ **Environment management** - Separate dev/prod configs
-
----
-
-## 💻 Local Development (No Kubernetes)
-
-**Want to just run the app locally for development?**
-
-### Prerequisites
-```bash
-# Node.js 18+
-node --version
-
-# Install dependencies
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### Environment Variables
-
-**Backend** (`backend/.env`):
-```env
-MONGODB_URI=mongodb://localhost:27017/tiptrack
-PORT=5001
-JWT_SECRET=your-secret-key-change-in-production
-```
-
-**Frontend** (`frontend/.env`):
-```env
-VITE_API_URL=http://localhost:5001
-```
-
-### Run Locally
-```bash
-# Terminal 1 - Backend
-cd backend
-node server.js
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
-```
-
-Open http://localhost:5173
 
 ---
 
 ## 🔌 API Endpoints
 
-**Base URLs:**
-- **Production:** `https://tiptrack-production.up.railway.app`
-- **Kubernetes:** `http://localhost:5000`
+**Base URL:** `http://localhost:5000`
 
 ### Authentication Routes
 | Method | Endpoint | Description |
@@ -420,8 +231,7 @@ tiptrack/
 │   │   ├── shifts.js     # Shift CRUD operations
 │   │   └── auth.js       # Login/signup endpoints
 │   ├── server.js          # Main server file
-│   ├── Dockerfile         # Backend container image
-│   └── nixpacks.toml      # Railway build config
+│   └── Dockerfile         # Backend container image
 ├── frontend/              # React + Vite app
 │   ├── src/
 │   │   ├── components/   # React components
@@ -446,11 +256,153 @@ tiptrack/
 
 - ✅ **Password hashing** with bcrypt (10 salt rounds)
 - ✅ **JWT token authentication** (90-day expiration)
-- ✅ **HTTPS** on both Railway and Vercel
 - ✅ **CORS** configured for cross-origin requests
 - ✅ **Environment variables** for secrets
+- ✅ **Kubernetes Secrets** for sensitive data
 - ✅ **Authorization headers** on protected routes
-- ✅ **Kubernetes Secrets** for sensitive data in K8s deployment
+
+---
+
+## 📊 Kubernetes Features Demonstrated
+
+- ✅ **Multi-container deployment** - Frontend, Backend, MongoDB
+- ✅ **Service discovery** - Services communicate via DNS
+- ✅ **Persistent storage** - PVC for MongoDB data
+- ✅ **Secrets management** - MongoDB credentials + JWT secrets
+- ✅ **ConfigMaps** - Environment configuration
+- ✅ **Health probes** - Liveness and readiness checks
+- ✅ **Rolling updates** - Zero-downtime deployments
+- ✅ **Auto-scaling** - Multiple replicas for high availability
+- ✅ **Self-healing** - Automatic pod restarts
+
+---
+
+## 🧪 Testing
+
+```bash
+# Check all resources
+kubectl get all -n tiptrack
+
+# View pod logs
+kubectl logs <pod-name> -n tiptrack
+
+# Check health endpoint
+curl http://localhost:5000/health
+
+# Test signup
+curl -X POST http://localhost:5000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"test123"}'
+
+# Test login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"test123"}'
+
+# Get service URLs
+minikube service list -n tiptrack
+```
+
+---
+
+## 🛠️ Troubleshooting
+
+**Common issues and solutions:**
+
+**1. Pods not starting:**
+```bash
+# Check pod status
+kubectl get pods -n tiptrack
+
+# View pod logs for errors
+kubectl logs <pod-name> -n tiptrack
+
+# Describe pod for events
+kubectl describe pod <pod-name> -n tiptrack
+```
+
+**2. Can't access the app:**
+```bash
+# Verify services are running
+kubectl get svc -n tiptrack
+
+# Check if port-forward is active
+# Make sure both terminals with port-forward are still running
+
+# Try restarting port-forward
+# Kill the terminal process and run the commands again
+```
+
+**3. MongoDB connection issues:**
+```bash
+# Check MongoDB pod logs
+kubectl logs <mongodb-pod> -n tiptrack
+
+# Verify MongoDB service
+kubectl get svc mongodb-service -n tiptrack
+
+# Check backend logs for connection errors
+kubectl logs <backend-pod> -n tiptrack | grep MongoDB
+```
+
+**4. Images not found:**
+```bash
+# Make sure you built images in Minikube's environment
+eval $(minikube docker-env)
+
+# Rebuild images
+cd backend && docker build -t tiptrack-backend:latest .
+cd ../frontend && docker build -t tiptrack-frontend:latest .
+
+# Redeploy
+kubectl rollout restart deployment -n tiptrack
+```
+
+**Full reset (last resort):**
+```bash
+kubectl delete namespace tiptrack
+minikube stop
+minikube start
+# Then re-deploy: kubectl apply -f k8s/
+```
+
+---
+
+## 🧹 Cleanup
+
+```bash
+# Delete everything
+kubectl delete namespace tiptrack
+
+# Stop Minikube
+minikube stop
+
+# Delete Minikube cluster (optional - frees up disk space)
+minikube delete
+
+# Clear browser data (logout)
+# Open browser console (F12) and run:
+localStorage.clear()
+```
+
+---
+
+## 🎤 Interview Talking Points
+
+### Why Kubernetes?
+> "I chose Kubernetes to demonstrate container orchestration, service discovery, and self-healing infrastructure. The app showcases key concepts like persistent storage, health checks, and zero-downtime deployments - all critical for SRE roles."
+
+### Technical Implementation
+> "I implemented a 3-tier architecture with separate frontend, backend, and database services. Each service has multiple replicas for high availability, persistent volumes for data durability, and health probes for automatic recovery. The entire stack is defined as code using Kubernetes manifests."
+
+### Challenges Faced
+> "The main challenge was Kubernetes networking in Minikube. Services use internal DNS (like `backend-service`), which works inside the cluster but not from a browser. I solved this using `kubectl port-forward` to map localhost ports directly to services, creating a consistent development workflow."
+
+### What I Learned
+> "This project taught me how to think about infrastructure as code, handle service discovery, manage secrets securely, and implement self-healing systems. I also gained hands-on experience with persistent storage, rolling updates, and troubleshooting containerized applications."
+
+### Production Improvements
+> "For production, I'd implement: Ingress controller with TLS for external access, managed database (like AWS RDS) for better reliability, HashiCorp Vault for secrets management, Horizontal Pod Autoscaler for dynamic scaling, and monitoring with Prometheus/Grafana for observability."
 
 ---
 
@@ -466,18 +418,19 @@ tiptrack/
 - Health checks (liveness/readiness probes)
 - Self-healing and auto-scaling
 - Multi-container deployments
+- Rolling updates and zero-downtime deployments
 
 **Docker Skills:**
 - Multi-stage builds
 - Container optimization
 - Image management
-- Docker Compose (alternative)
+- Dockerfile best practices
 
-**Cloud Platform Knowledge:**
-- Modern cloud architecture (Railway + Vercel)
-- CI/CD pipelines
-- Microservices deployment
-- Managed services vs self-hosted
+**Infrastructure as Code:**
+- YAML manifests for all resources
+- Declarative configuration
+- Version-controlled infrastructure
+- Reproducible deployments
 
 ### For Full-Stack Roles:
 
@@ -486,74 +439,45 @@ tiptrack/
 - JWT authentication from scratch
 - Responsive UI with animations
 - State management in React
+- Password hashing and security best practices
 
-### Interview Talking Points:
+### Key Competencies:
 
-✅ "Deployed the same application using both Kubernetes and cloud platforms to demonstrate versatility"  
+✅ "Deployed a full-stack application using Kubernetes with 3-tier architecture"  
 ✅ "Implemented container orchestration with self-healing, persistent storage, and service discovery"  
-✅ "Built CI/CD pipelines with auto-deployment from GitHub"  
-✅ "Configured health probes, secrets management, and rolling updates in Kubernetes"  
-✅ "Designed a microservices architecture with separate frontend and backend deployments"
+✅ "Configured health probes, secrets management, and rolling updates"  
+✅ "Built a production-ready authentication system with JWT and bcrypt"  
+✅ "Demonstrated infrastructure as code with version-controlled Kubernetes manifests"
 
 ---
 
-## 🐛 Troubleshooting
+## 🚀 Alternative Deployment: Docker Compose
 
-### Kubernetes Issues
+**Want a simpler way to run the app? Use Docker Compose!**
 
 ```bash
-# Are all pods running?
-kubectl get pods -n tiptrack
+# Start everything
+docker-compose up --build
 
-# Check pod logs for errors
-kubectl logs <pod-name> -n tiptrack
+# Open browser
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5001
 
-# Verify services exist
-kubectl get svc -n tiptrack
-
-# Check MongoDB connection
-kubectl logs <backend-pod> -n tiptrack | grep MongoDB
+# Stop everything
+docker-compose down
 ```
 
-### Cloud Deployment Issues
+**What docker-compose does:**
+- Starts MongoDB on port 27017
+- Starts Backend API on port 5001
+- Starts Frontend on port 3000
+- Connects them all together
+- Saves data in a Docker volume
 
-**Backend (Railway):**
-```bash
-# Test health endpoint
-curl https://tiptrack-production.up.railway.app/health
-
-# Check logs in Railway dashboard
-# Railway → tiptrack service → Deploy Logs
-```
-
-**Frontend (Vercel):**
-```bash
-# Verify environment variable
-# Vercel → tiptrack → Settings → Environment Variables
-# VITE_API_URL should be: https://tiptrack-production.up.railway.app
-```
-
----
-
-## 🧹 Why Two Deployment Methods?
-
-**Kubernetes Deployment:**
-- Shows deep DevOps/SRE skills
-- Demonstrates container orchestration
-- Perfect for "Have you worked with Kubernetes?" interviews
-- Self-hosted, full control
-
-**Cloud Deployment:**
-- Shows modern platform knowledge
-- Easier to share with recruiters (just send a link!)
-- Demonstrates CI/CD understanding
-- Production-ready, scalable
-
-**Together, they show:**
-- ✅ You understand both traditional DevOps AND modern cloud platforms
-- ✅ You can choose the right tool for the job
-- ✅ You're not locked into one approach
-- ✅ You can work in startups (cloud) or enterprises (K8s)
+**Use this for:**
+- Quick testing
+- Local development
+- When you don't need to demo Kubernetes skills
 
 ---
 
@@ -571,7 +495,6 @@ Built as a portfolio project to demonstrate:
 - Modern animated UI design
 - **Containerization** (Docker)
 - **Container orchestration** (Kubernetes)
-- **Cloud deployment** (Railway + Vercel)
 - DevOps/SRE practices
 - Security best practices
 
