@@ -7,13 +7,6 @@
   <img src="screenshot-tax.png" width="600" alt="Tax-Free Tracker">
 </div>
 
-# TipTrack 💰
-
-<div align="center">
-  <img src="screenshot-dashboard.png" width="600" alt="Dashboard">
-  <img src="screenshot-calendar.png" width="600" alt="Calendar View">
-  <img src="screenshot-add-shift.png" width="600" alt="Add Shift Form">
-</div>
 
 _Built by a bartender, for bartenders._
 
