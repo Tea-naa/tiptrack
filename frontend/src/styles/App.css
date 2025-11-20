@@ -1773,3 +1773,58 @@ body {
   /* Light red background on hover */
 }
 
+/* ========================================
+   CUSTOM TOOLTIP FOR INFO ICON
+   ======================================== */
+.info-icon {
+  position: relative;
+  color: var(--text-muted);
+  cursor: help;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.info-icon:hover {
+  color: var(--success);
+}
+
+/* Tooltip content */
+.info-icon::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+/* Tooltip arrow */
+.info-icon::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0px);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+/* Show on hover */
+.info-icon:hover::after,
+.info-icon:hover::before {
+  opacity: 1;
+}

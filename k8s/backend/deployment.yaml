@@ -30,6 +30,14 @@ spec:
         envFrom:
         - configMapRef:
             name: backend-config
+
+        # Load JWT_SECRET from Secret
+        env:
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: JWT_SECRET
         
         # Resource management
         resources:

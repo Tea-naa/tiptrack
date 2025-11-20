@@ -1,7 +1,7 @@
 // API Service - All backend communication with JWT authentication
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/shifts';
 
 // Create axios instance with auth interceptor
 const api = axios.create({
@@ -26,7 +26,7 @@ api.interceptors.request.use(config => {
 
 export const getAllShifts = async () => {
   try {
-    const response = await api.get('/');
+    const response = await api.get('');
     return response.data;
   } catch (error) {
     console.error('Error fetching shifts:', error);
@@ -36,7 +36,7 @@ export const getAllShifts = async () => {
 
 export const getShiftById = async (id) => {
   try {
-    const response = await api.get(`/${id}`);
+    const response = await api.get(`${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching shift:', error);
@@ -46,7 +46,7 @@ export const getShiftById = async (id) => {
 
 export const createShift = async (shiftData) => {
   try {
-    const response = await api.post('/', shiftData);
+    const response = await api.post('', shiftData);
     return response.data;
   } catch (error) {
     console.error('Error creating shift:', error);
@@ -56,7 +56,7 @@ export const createShift = async (shiftData) => {
 
 export const updateShift = async (id, shiftData) => {
   try {
-    const response = await api.put(`/${id}`, shiftData);
+    const response = await api.put(`${id}`, shiftData);
     return response.data;
   } catch (error) {
     console.error('Error updating shift:', error);
@@ -66,7 +66,7 @@ export const updateShift = async (id, shiftData) => {
 
 export const deleteShift = async (id) => {
   try {
-    const response = await api.delete(`/${id}`);
+    const response = await api.delete(`${id}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting shift:', error);
@@ -76,7 +76,7 @@ export const deleteShift = async (id) => {
 
 export const getStats = async () => {
   try {
-    const response = await api.get('/stats/summary');
+    const response = await api.get('stats/summary');
     return response.data;
   } catch (error) {
     console.error('Error fetching stats:', error);

@@ -24,7 +24,7 @@ const TaxFreeTracker = ({ yearToDateClaimed, taxRate }) => {
           <PiggyBank size={24} />
           Tax-Free Tip Tracker (2025)
         </h3>
-        <div className="info-icon" title="First $25,000 in claimed tips is tax-free!">
+        <div className="info-icon" data-tooltip="First $25,000 in claimed tips is tax-free!">
           <AlertCircle size={18} />
         </div>
       </div>

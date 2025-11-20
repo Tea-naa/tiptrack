@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import StatsCard from './StatsCard';
 import TaxFreeTracker from './TaxFreeTracker';  
-import MonthlyBreakdown from './MonthlyBreakdown';  // ← NEW IMPORT
+import MonthlyBreakdown from './MonthlyBreakdown';  
 import { getStats, formatCurrency } from '../services/api';
 import { DollarSign, TrendingUp, Calendar, PiggyBank } from 'lucide-react';
 
@@ -13,7 +13,7 @@ const Dashboard = ({ refreshTrigger, onNavigateToMonth }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showMonthlyBreakdown, setShowMonthlyBreakdown] = useState(false);  // ← NEW STATE
+  const [showMonthlyBreakdown, setShowMonthlyBreakdown] = useState(false);  
 
   // Load data whenever the dashboard refresh trigger changes
   useEffect(() => {
@@ -93,7 +93,7 @@ const Dashboard = ({ refreshTrigger, onNavigateToMonth }) => {
           icon={<TrendingUp />}
         />
 
-        {/* This Month - NOW CLICKABLE! */}
+        {/* This Month -  CLICKABLE! */}
         <div 
           onClick={() => setShowMonthlyBreakdown(true)} 
           style={{ cursor: 'pointer' }}
@@ -107,7 +107,7 @@ const Dashboard = ({ refreshTrigger, onNavigateToMonth }) => {
           />
         </div>
 
-        {/* NEW: Total Income */}
+        {/*  Total Income */}
         <StatsCard
           title="Total Income"
           value={totalIncome}
@@ -146,7 +146,7 @@ const Dashboard = ({ refreshTrigger, onNavigateToMonth }) => {
       </div>
 
       {/* ========================================= */}
-      {/* MONTHLY BREAKDOWN MODAL - NEW!           */}
+      {/* MONTHLY BREAKDOWN MODAL          */}
       {/* ========================================= */}
       {showMonthlyBreakdown && (
         <div 

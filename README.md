@@ -9,6 +9,12 @@
 
 # TipTrack 💰
 
+<div align="center">
+  <img src="screenshot-dashboard.png" width="600" alt="Dashboard">
+  <img src="screenshot-calendar.png" width="600" alt="Calendar View">
+  <img src="screenshot-add-shift.png" width="600" alt="Add Shift Form">
+</div>
+
 _Built by a bartender, for bartenders._
 
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)
@@ -47,8 +53,9 @@ User → Frontend (LoadBalancer)
 - **3 Deployments:** Frontend (2 replicas), Backend (2 replicas), MongoDB (1 replica)
 - **3 Services:** Frontend (LoadBalancer), Backend (ClusterIP), MongoDB (ClusterIP)
 - **1 PVC:** Persistent storage for MongoDB data
-- **Health Probes:** Liveness and readiness checks
-- **Self-Healing:** Kubernetes restarts failed pods automatically
+- **1 Secret:** JWT secret for token signing
+- **Health Probes:** Liveness and readiness checks on backend
+- **Self-Healing:** Kubernetes automatically restarts failed pods
 
 ---
 
@@ -56,40 +63,43 @@ User → Frontend (LoadBalancer)
 
 - ✅ **User Authentication** - Secure signup/login with JWT tokens (90-day expiration)
 - ✅ **Beautiful Animated UI** - Neon-style login with gradient borders and smooth animations
-- ✅ **Password Security** - Bcrypt hashing with show/hide toggle
-- ✅ **Add/Edit/Delete Shifts** - Track every shift you work
-- ✅ **Cash vs Credit Tips** - Separate tracking or total entry
+- ✅ **Password Security** - Bcrypt hashing (10 salt rounds) with show/hide toggle
+- ✅ **Add/Edit/Delete Shifts** - Full CRUD operations for shift management
+- ✅ **Cash vs Credit Tips** - Separate tracking or total entry modes
 - ✅ **Tax Calculator** - Auto-calculates withholding (claimed × rate)
-- ✅ **Dashboard** - Today, week, month, and total stats
-- ✅ **$25K Tax-Free Tracker** - Know exactly how much is tax-free
-- ✅ **Persistent Data** - MongoDB with persistent volume
-- ✅ **Self-Healing** - Kubernetes auto-restarts failed pods
-- ✅ **Health Probes** - Liveness and readiness checks
+- ✅ **Dashboard Analytics** - Today, week, month, and total earnings stats
+- ✅ **Calendar View** - Visual shift history by month
+- ✅ **$25K Tax-Free Tracker** - Real-time progress toward tax-free threshold
+- ✅ **Persistent Data** - MongoDB with Kubernetes persistent volume
+- ✅ **Self-Healing Infrastructure** - Kubernetes auto-restarts failed pods
+- ✅ **Health Monitoring** - Liveness and readiness checks
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- React 18 (with Vite)
-- Axios for API calls
-- Lucide-React icons (including eye toggle for passwords)
+- React 18 (with Vite for fast builds)
+- Axios for API calls with JWT interceptors
+- Lucide-React icons (including password visibility toggle)
 - Modern animated neon theme UI
-- JWT token storage (localStorage)
+- JWT token storage in localStorage
+- Responsive design for mobile/desktop
 
 ### Backend
 - Node.js + Express
-- MongoDB + Mongoose
-- **bcryptjs** - Password hashing
-- **jsonwebtoken** - JWT authentication
-- CORS enabled
-- RESTful API design
+- MongoDB + Mongoose ODM
+- **bcryptjs** - Password hashing (10 salt rounds)
+- **jsonwebtoken** - JWT authentication with 90-day expiration
+- CORS enabled for cross-origin requests
+- RESTful API design with protected routes
 
-### DevOps
-- Docker (multi-stage builds)
-- Kubernetes (Deployments, Services, ConfigMaps, Secrets)
-- Minikube (local development cluster)
-- Health checks (liveness + readiness probes)
+### DevOps & Infrastructure
+- **Docker** - Multi-stage builds for optimized images
+- **Kubernetes** - Deployments, Services, ConfigMaps, Secrets, PVCs
+- **Minikube** - Local Kubernetes cluster for development
+- **Nginx** - Production-grade web server for React frontend
+- **Health Checks** - Liveness + readiness probes for zero-downtime
 
 ---
 
@@ -109,20 +119,24 @@ User → Frontend (LoadBalancer)
    brew install kubectl
    ```
 
-2. **Install project dependencies:**
+2. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/tiptrack.git
+   cd tiptrack
+   ```
+
+3. **Install project dependencies:**
    ```bash
    # Backend
    cd backend
    npm install
-   npm install cors bcryptjs jsonwebtoken  # ⚠️ REQUIRED for API and auth!
    
    # Frontend
    cd ../frontend
    npm install
-   npm install lucide-react  # ⚠️ REQUIRED for eye icon and UI!
    ```
 
-3. **Set up environment variables:**
+4. **Set up environment variables:**
    
    **Backend** (`backend/.env`):
    ```env
@@ -133,30 +147,34 @@ User → Frontend (LoadBalancer)
    
    **Frontend** (`frontend/.env`):
    ```env
-   VITE_API_URL=http://localhost:5000
+   VITE_API_URL=http://localhost:5000/api/shifts
    ```
 
 ### Deploy to Kubernetes
 
-**Quick version:**
 ```bash
 # 1. Start Minikube
 minikube start --cpus=4 --memory=4096 --driver=docker
 
-# 2. Build images in Minikube
+# 2. Build Docker images in Minikube's environment
 eval $(minikube docker-env)
 cd backend && docker build -t tiptrack-backend:latest .
 cd ../frontend && docker build -t tiptrack-frontend:latest .
 
-# 3. Deploy
+# 3. Create Kubernetes Secret for JWT
 cd ..
+kubectl create secret generic backend-secret \
+  --from-literal=JWT_SECRET=your-super-secret-key-change-this-in-production \
+  -n tiptrack
+
+# 4. Deploy all Kubernetes resources
 kubectl apply -f k8s/
 
-# 4. Wait for pods to be ready
+# 5. Wait for all pods to be ready
 kubectl get pods -n tiptrack -w
-# Press Ctrl+C when all show Running
+# Press Ctrl+C when all pods show "Running" status
 
-# 5. Access the app (see Daily Usage section below)
+# 6. Continue to Daily Usage section below
 ```
 
 ---
@@ -165,32 +183,41 @@ kubectl get pods -n tiptrack -w
 
 **Every time you want to use the app:**
 
-### Step 1: Check Minikube
+### Step 1: Check Minikube Status
 ```bash
 minikube status
-# If stopped: minikube start
+# If stopped, start it:
+# minikube start
 ```
 
-### Step 2: Open 2 Terminals (Keep Both Running!)
+### Step 2: Open 2 Terminal Windows (Keep Both Running!)
 
-**Terminal 1 (Backend):**
+**Terminal 1 (Backend API):**
 ```bash
 kubectl port-forward -n tiptrack service/backend-service 5000:5000
 ```
+You should see: `Forwarding from 127.0.0.1:5000 -> 5000`
 
-**Terminal 2 (Frontend):**
+**Terminal 2 (Frontend UI):**
 ```bash
 kubectl port-forward -n tiptrack service/frontend-service 3000:80
 ```
+You should see: `Forwarding from 127.0.0.1:3000 -> 80`
 
-### Step 3: Open Browser
+### Step 3: Open Your Browser
+Navigate to:
 ```
 http://localhost:3000
 ```
 
-**First time?** Create an account on the animated login screen!
+**First time using the app?**  
+1. Click "Sign Up" on the login screen
+2. Create your account with a username and password
+3. Start tracking your shifts!
 
-**✅ Ports never change! Always localhost:3000**
+**✅ These ports never change - always use localhost:3000**
+
+**⚠️ Important:** Keep both terminal windows open while using the app. Closing them will disconnect the port forwards.
 
 ---
 
@@ -199,23 +226,28 @@ http://localhost:3000
 **Base URL:** `http://localhost:5000`
 
 ### Authentication Routes
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/signup` | Create new user account |
-| POST | `/api/auth/login` | Login and get JWT token |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/signup` | Create new user account | No |
+| POST | `/api/auth/login` | Login and receive JWT token | No |
 
-### Shift Routes
-**Base:** `/api/shifts`
+### Shift Management Routes
+**Base Path:** `/api/shifts`
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Health check |
-| GET | `/` | Get all shifts (requires auth) |
-| GET | `/:id` | Get shift by ID (requires auth) |
-| POST | `/` | Create new shift (requires auth) |
-| PUT | `/:id` | Update shift (requires auth) |
-| DELETE | `/:id` | Delete shift (requires auth) |
-| GET | `/stats/summary` | Get dashboard stats (requires auth) |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/health` | Backend health check | No |
+| GET | `/` | Get all shifts for logged-in user | Yes |
+| GET | `/:id` | Get specific shift by ID | Yes |
+| POST | `/` | Create new shift | Yes |
+| PUT | `/:id` | Update existing shift | Yes |
+| DELETE | `/:id` | Delete shift | Yes |
+| GET | `/stats/summary` | Get dashboard statistics | Yes |
+
+**Authentication:** Protected routes require JWT token in Authorization header:
+```
+Authorization: Bearer <your-jwt-token>
+```
 
 ---
 
@@ -223,83 +255,118 @@ http://localhost:3000
 
 ```
 tiptrack/
-├── backend/                # Node.js + Express API
-│   ├── models/            # Mongoose schemas
-│   │   ├── Shift.js      # Shift data model
-│   │   └── User.js       # User authentication model
-│   ├── routes/            # API endpoints
-│   │   ├── shifts.js     # Shift CRUD operations
-│   │   └── auth.js       # Login/signup endpoints
-│   ├── server.js          # Main server file
-│   └── Dockerfile         # Backend container image
-├── frontend/              # React + Vite app
+├── backend/                    # Node.js + Express API
+│   ├── models/                # Mongoose schemas
+│   │   ├── Shift.js          # Shift data model
+│   │   └── User.js           # User authentication model
+│   ├── routes/                # API route handlers
+│   │   ├── shifts.js         # Shift CRUD operations
+│   │   └── auth.js           # Login/signup endpoints
+│   ├── server.js              # Main Express server
+│   ├── Dockerfile             # Backend container image
+│   └── .env                   # Backend environment variables
+├── frontend/                   # React + Vite application
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   │   └── Login.jsx # Animated login component
-│   │   ├── services/     # API client
-│   │   │   └── api.js   # Axios + JWT configuration
-│   │   └── styles/       # CSS files
-│   ├── Dockerfile        # Frontend container image
-│   ├── nginx.conf        # Nginx configuration
-│   └── vite.config.js    # Vite build config
-├── k8s/                   # Kubernetes manifests
-│   ├── namespace.yaml     # tiptrack namespace
-│   ├── mongodb/           # Database resources
-│   ├── backend/           # API resources
-│   └── frontend/          # UI resources
-└── README.md
+│   │   ├── components/       # React components
+│   │   │   ├── Login.jsx    # Animated login component
+│   │   │   ├── Dashboard.jsx # Main dashboard view
+│   │   │   ├── ShiftCalendar.jsx # Calendar view
+│   │   │   └── AddShiftForm.jsx  # Add/edit shift modal
+│   │   ├── services/         # API client layer
+│   │   │   └── api.js       # Axios + JWT configuration
+│   │   ├── styles/           # CSS styling
+│   │   └── App.jsx           # Root component
+│   ├── Dockerfile            # Frontend container image
+│   ├── nginx.conf            # Nginx web server config
+│   ├── vite.config.js        # Vite build configuration
+│   └── .env                  # Frontend environment variables
+├── k8s/                        # Kubernetes manifests
+│   ├── namespace.yaml         # tiptrack namespace
+│   ├── mongodb/               # MongoDB deployment & service
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── pvc.yaml          # Persistent volume claim
+│   ├── backend/               # Backend deployment & service
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── configmap.yaml
+│   └── frontend/              # Frontend deployment & service
+│       ├── deployment.yaml
+│       └── service.yaml
+├── docker-compose.yml          # Alternative Docker Compose setup
+└── README.md                   # This file
 ```
 
 ---
 
 ## 🔐 Security Features
 
-- ✅ **Password hashing** with bcrypt (10 salt rounds)
-- ✅ **JWT token authentication** (90-day expiration)
-- ✅ **CORS** configured for cross-origin requests
-- ✅ **Environment variables** for secrets
-- ✅ **Kubernetes Secrets** for sensitive data
-- ✅ **Authorization headers** on protected routes
+- ✅ **Password Hashing** - Bcrypt with 10 salt rounds (industry standard)
+- ✅ **JWT Authentication** - Tokens expire after 90 days
+- ✅ **Secure Token Storage** - localStorage with automatic header injection
+- ✅ **CORS Configuration** - Controlled cross-origin access
+- ✅ **Kubernetes Secrets** - Sensitive data encrypted at rest
+- ✅ **Environment Variables** - No hardcoded credentials
+- ✅ **Authorization Middleware** - Protected API routes
+- ✅ **Input Validation** - User data sanitization
 
 ---
 
 ## 📊 Kubernetes Features Demonstrated
 
-- ✅ **Multi-container deployment** - Frontend, Backend, MongoDB
-- ✅ **Service discovery** - Services communicate via DNS
-- ✅ **Persistent storage** - PVC for MongoDB data
-- ✅ **Secrets management** - MongoDB credentials + JWT secrets
-- ✅ **ConfigMaps** - Environment configuration
-- ✅ **Health probes** - Liveness and readiness checks
-- ✅ **Rolling updates** - Zero-downtime deployments
-- ✅ **Auto-scaling** - Multiple replicas for high availability
-- ✅ **Self-healing** - Automatic pod restarts
+- ✅ **Multi-Container Orchestration** - Frontend, Backend, MongoDB in separate pods
+- ✅ **Service Discovery** - Internal DNS resolution (mongodb-service, backend-service)
+- ✅ **Persistent Storage** - PersistentVolumeClaim for MongoDB data durability
+- ✅ **Secrets Management** - JWT secret stored in Kubernetes Secret
+- ✅ **ConfigMaps** - Environment configuration separated from code
+- ✅ **Health Probes** - Liveness and readiness checks for automatic recovery
+- ✅ **Rolling Updates** - Zero-downtime deployments with replica management
+- ✅ **High Availability** - Multiple replicas (2 frontend, 2 backend pods)
+- ✅ **Self-Healing** - Automatic pod restart on failure
+- ✅ **Resource Management** - CPU and memory limits/requests defined
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
+### Check Cluster Status
 ```bash
-# Check all resources
+# View all resources in tiptrack namespace
 kubectl get all -n tiptrack
 
-# View pod logs
-kubectl logs <pod-name> -n tiptrack
+# Check pod logs
+kubectl logs -n tiptrack deployment/backend
+kubectl logs -n tiptrack deployment/frontend
 
-# Check health endpoint
+# Describe resources for debugging
+kubectl describe pod <pod-name> -n tiptrack
+```
+
+### Test Backend Health
+```bash
+# Health check endpoint
 curl http://localhost:5000/health
 
-# Test signup
+# Expected response:
+# {"status":"OK","message":"TipTrack API is running","timestamp":"..."}
+```
+
+### Test Authentication
+```bash
+# Sign up new user
 curl -X POST http://localhost:5000/api/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"test123"}'
+  -d '{"username":"testuser","password":"securepass123"}'
 
-# Test login
+# Login
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"test123"}'
+  -d '{"username":"testuser","password":"securepass123"}'
+```
 
-# Get service URLs
+### View Services
+```bash
+# List all services with their ports
 minikube service list -n tiptrack
 ```
 
@@ -307,81 +374,151 @@ minikube service list -n tiptrack
 
 ## 🛠️ Troubleshooting
 
-**Common issues and solutions:**
+### Pods Not Starting
 
-**1. Pods not starting:**
+**Symptom:** Pods stuck in `Pending`, `CrashLoopBackOff`, or `Error` state
+
+**Diagnosis:**
 ```bash
 # Check pod status
 kubectl get pods -n tiptrack
 
-# View pod logs for errors
-kubectl logs <pod-name> -n tiptrack
-
-# Describe pod for events
+# View pod events
 kubectl describe pod <pod-name> -n tiptrack
+
+# Check logs for errors
+kubectl logs <pod-name> -n tiptrack
 ```
 
-**2. Can't access the app:**
+**Common fixes:**
+- **ImagePullBackOff:** Rebuild images with `eval $(minikube docker-env)` first
+- **CrashLoopBackOff:** Check logs for application errors (missing env vars, connection issues)
+- **Pending:** Check if Minikube has enough resources (`minikube start --cpus=4 --memory=4096`)
+
+### Cannot Access Application
+
+**Symptom:** Browser shows "This site can't be reached" or "Connection refused"
+
+**Diagnosis:**
 ```bash
-# Verify services are running
+# Check if port-forward is running
+ps aux | grep "port-forward"
+
+# Verify services exist
 kubectl get svc -n tiptrack
-
-# Check if port-forward is active
-# Make sure both terminals with port-forward are still running
-
-# Try restarting port-forward
-# Kill the terminal process and run the commands again
 ```
 
-**3. MongoDB connection issues:**
-```bash
-# Check MongoDB pod logs
-kubectl logs <mongodb-pod> -n tiptrack
+**Fixes:**
+1. Ensure **both** port-forward terminals are running
+2. Kill any existing port-forwards: `killall kubectl`
+3. Restart port-forwards fresh
+4. Check if Minikube is running: `minikube status`
 
-# Verify MongoDB service
+### MongoDB Connection Failures
+
+**Symptom:** Backend logs show "MongoDB connection error"
+
+**Diagnosis:**
+```bash
+# Check MongoDB pod
+kubectl get pod -n tiptrack -l app=mongodb
+
+# View MongoDB logs
+kubectl logs -n tiptrack deployment/mongodb
+
+# Verify MongoDB service DNS
 kubectl get svc mongodb-service -n tiptrack
-
-# Check backend logs for connection errors
-kubectl logs <backend-pod> -n tiptrack | grep MongoDB
 ```
 
-**4. Images not found:**
+**Fixes:**
+- Ensure backend `.env` uses `mongodb://mongodb-service:27017/tiptrack`
+- Check if MongoDB pod is running
+- Verify PVC is bound: `kubectl get pvc -n tiptrack`
+
+### Images Not Found
+
+**Symptom:** Pods show `ImagePullBackOff` or `ErrImagePull`
+
+**Diagnosis:**
 ```bash
-# Make sure you built images in Minikube's environment
+# Check deployment image configuration
+kubectl get deployment -n tiptrack -o yaml | grep image:
+```
+
+**Fixes:**
+```bash
+# CRITICAL: Build in Minikube's Docker environment
 eval $(minikube docker-env)
 
 # Rebuild images
 cd backend && docker build -t tiptrack-backend:latest .
 cd ../frontend && docker build -t tiptrack-frontend:latest .
 
-# Redeploy
+# Force pod restart
 kubectl rollout restart deployment -n tiptrack
 ```
 
-**Full reset (last resort):**
+### Port Forward Disconnects
+
+**Symptom:** Port-forward randomly stops working
+
+**Causes:** Pods restart during deployment updates
+
+**Fix:**
 ```bash
+# Kill existing port-forwards
+killall kubectl
+
+# Wait for pods to stabilize
+kubectl get pods -n tiptrack -w
+
+# Start fresh port-forwards
+kubectl port-forward -n tiptrack service/backend-service 5000:5000
+kubectl port-forward -n tiptrack service/frontend-service 3000:80
+```
+
+### Full Reset (Nuclear Option)
+
+If nothing else works:
+```bash
+# Delete everything
 kubectl delete namespace tiptrack
+
+# Stop and restart Minikube
 minikube stop
-minikube start
-# Then re-deploy: kubectl apply -f k8s/
+minikube delete
+minikube start --cpus=4 --memory=4096 --driver=docker
+
+# Redeploy from scratch
+eval $(minikube docker-env)
+cd backend && docker build -t tiptrack-backend:latest .
+cd ../frontend && docker build -t tiptrack-frontend:latest .
+cd .. && kubectl apply -f k8s/
 ```
 
 ---
 
 ## 🧹 Cleanup
 
+### Stop the Application (Keep Data)
 ```bash
-# Delete everything
+# Stop port-forwards (Ctrl+C in both terminals)
+
+# Stop Minikube (keeps cluster data)
+minikube stop
+```
+
+### Delete Everything
+```bash
+# Delete all TipTrack resources
 kubectl delete namespace tiptrack
 
-# Stop Minikube
+# Stop and delete Minikube cluster
 minikube stop
-
-# Delete Minikube cluster (optional - frees up disk space)
 minikube delete
 
-# Clear browser data (logout)
-# Open browser console (F12) and run:
+# Clear browser data
+# Open browser console (F12) → Console tab → run:
 localStorage.clear()
 ```
 
@@ -390,19 +527,22 @@ localStorage.clear()
 ## 🎤 Interview Talking Points
 
 ### Why Kubernetes?
-> "I chose Kubernetes to demonstrate container orchestration, service discovery, and self-healing infrastructure. The app showcases key concepts like persistent storage, health checks, and zero-downtime deployments - all critical for SRE roles."
+> "I chose Kubernetes to demonstrate container orchestration, service discovery, and self-healing infrastructure. The app showcases critical SRE concepts like persistent storage, health checks, secrets management, and zero-downtime deployments—all skills directly applicable to production environments."
 
-### Technical Implementation
-> "I implemented a 3-tier architecture with separate frontend, backend, and database services. Each service has multiple replicas for high availability, persistent volumes for data durability, and health probes for automatic recovery. The entire stack is defined as code using Kubernetes manifests."
+### Technical Architecture
+> "I implemented a 3-tier microservices architecture with clear separation of concerns. The frontend is a React SPA served by Nginx, the backend is a RESTful Node.js API with JWT authentication, and MongoDB provides persistent storage with a PVC. Each service runs in separate pods with multiple replicas for high availability. Services communicate via Kubernetes internal DNS, and health probes ensure automatic recovery from failures."
 
-### Challenges Faced
-> "The main challenge was Kubernetes networking in Minikube. Services use internal DNS (like `backend-service`), which works inside the cluster but not from a browser. I solved this using `kubectl port-forward` to map localhost ports directly to services, creating a consistent development workflow."
+### Challenges & Solutions
+> "The biggest challenge was Kubernetes networking in a local development environment. Services use internal DNS names like 'backend-service' which work inside the cluster but aren't accessible from my browser. I solved this with kubectl port-forward to create tunnels from localhost to the cluster services. I also had to ensure Docker images were built in Minikube's Docker environment rather than my local Docker daemon."
+
+### Authentication Implementation
+> "I built the authentication system from scratch using industry-standard practices: bcrypt for password hashing with 10 salt rounds, JWTs for stateless authentication with 90-day expiration, and secure token storage in localStorage. The frontend Axios instance automatically injects tokens into request headers, and the backend middleware validates tokens before processing protected routes."
 
 ### What I Learned
-> "This project taught me how to think about infrastructure as code, handle service discovery, manage secrets securely, and implement self-healing systems. I also gained hands-on experience with persistent storage, rolling updates, and troubleshooting containerized applications."
+> "This project taught me infrastructure-as-code principles, container orchestration patterns, and how to debug distributed systems. I gained hands-on experience with persistent storage, rolling updates, health probes, secrets management, and the complete development lifecycle of a Kubernetes application. Most importantly, I learned how to troubleshoot containerized applications systematically."
 
 ### Production Improvements
-> "For production, I'd implement: Ingress controller with TLS for external access, managed database (like AWS RDS) for better reliability, HashiCorp Vault for secrets management, Horizontal Pod Autoscaler for dynamic scaling, and monitoring with Prometheus/Grafana for observability."
+> "For production deployment, I would implement several enhancements: an Ingress controller with cert-manager for TLS termination and external access, a managed database service like AWS RDS for better reliability and automated backups, HashiCorp Vault for centralized secrets management, Horizontal Pod Autoscaler for dynamic scaling based on metrics, and a full observability stack with Prometheus for metrics, Grafana for dashboards, and ELK or Loki for centralized logging."
 
 ---
 
@@ -410,102 +550,124 @@ localStorage.clear()
 
 ### For SRE/DevOps Roles:
 
-**Kubernetes Expertise:**
-- Container orchestration with Kubernetes
-- Service discovery and networking
+**Container Orchestration:**
+- Kubernetes deployments with replica management
+- Service discovery and internal DNS
 - Persistent storage with PVCs
-- ConfigMaps and Secrets management
-- Health checks (liveness/readiness probes)
-- Self-healing and auto-scaling
-- Multi-container deployments
-- Rolling updates and zero-downtime deployments
-
-**Docker Skills:**
-- Multi-stage builds
-- Container optimization
-- Image management
-- Dockerfile best practices
+- ConfigMaps and Secrets for configuration management
+- Health probes (liveness and readiness)
+- Self-healing and automatic recovery
+- Rolling updates for zero-downtime deployments
 
 **Infrastructure as Code:**
-- YAML manifests for all resources
-- Declarative configuration
-- Version-controlled infrastructure
-- Reproducible deployments
+- All infrastructure defined in YAML manifests
+- Version-controlled Kubernetes configurations
+- Reproducible deployments across environments
+- Declarative resource management
+
+**Containerization:**
+- Multi-stage Docker builds for optimization
+- Container best practices (non-root users, minimal base images)
+- Image tagging and management
+- Docker Compose for development
+
+**Troubleshooting & Operations:**
+- Log aggregation and analysis
+- Resource monitoring and debugging
+- Pod lifecycle management
+- Network connectivity troubleshooting
 
 ### For Full-Stack Roles:
 
-- MERN stack implementation
-- RESTful API design
-- JWT authentication from scratch
-- Responsive UI with animations
-- State management in React
-- Password hashing and security best practices
+- **MERN Stack:** MongoDB, Express, React, Node.js
+- **RESTful API Design:** Proper HTTP methods, status codes, endpoint structure
+- **JWT Authentication:** Token-based auth from scratch
+- **Frontend State Management:** React hooks and component lifecycle
+- **Security:** Password hashing, CORS, input validation
+- **Modern Development:** Vite, ES6+, async/await, Axios interceptors
 
-### Key Competencies:
+### Key Resume Bullets:
 
-✅ "Deployed a full-stack application using Kubernetes with 3-tier architecture"  
-✅ "Implemented container orchestration with self-healing, persistent storage, and service discovery"  
-✅ "Configured health probes, secrets management, and rolling updates"  
-✅ "Built a production-ready authentication system with JWT and bcrypt"  
-✅ "Demonstrated infrastructure as code with version-controlled Kubernetes manifests"
+✅ "Deployed full-stack MERN application on Kubernetes with 3-tier architecture, persistent storage, and multi-replica high availability"
+
+✅ "Implemented container orchestration with self-healing, service discovery, health probes, and zero-downtime rolling updates"
+
+✅ "Built JWT-based authentication system with bcrypt password hashing, token refresh, and secure credential management via Kubernetes Secrets"
+
+✅ "Configured infrastructure as code using Kubernetes manifests, enabling reproducible deployments and version-controlled infrastructure"
+
+✅ "Designed RESTful API with protected routes, CRUD operations, and aggregated analytics endpoints for dashboard metrics"
 
 ---
 
-## 🚀 Alternative Deployment: Docker Compose
+## 🚀 Alternative: Docker Compose
 
-**Want a simpler way to run the app? Use Docker Compose!**
+**Want to run without Kubernetes?** Use Docker Compose for simpler local development:
 
 ```bash
-# Start everything
+# Start all services
 docker-compose up --build
 
-# Open browser
+# Access the application
 # Frontend: http://localhost:3000
-# Backend: http://localhost:5001
+# Backend API: http://localhost:5000
+# MongoDB: localhost:27017
 
-# Stop everything
+# Stop all services
 docker-compose down
+
+# Stop and remove volumes (deletes data)
+docker-compose down -v
 ```
 
-**What docker-compose does:**
-- Starts MongoDB on port 27017
-- Starts Backend API on port 5001
-- Starts Frontend on port 3000
-- Connects them all together
-- Saves data in a Docker volume
+**Docker Compose features:**
+- Single command deployment
+- Automatic service linking
+- Volume persistence
+- Simpler for development/testing
+- No Kubernetes knowledge required
 
-**Use this for:**
-- Quick testing
-- Local development
-- When you don't need to demo Kubernetes skills
+**Use Docker Compose when:**
+- Quick testing during development
+- Don't need to demonstrate K8s skills
+- Simpler onboarding for non-DevOps team members
+
+**Use Kubernetes when:**
+- Demonstrating infrastructure/SRE skills
+- Need production-like environment
+- Testing scaling and self-healing
+- Portfolio/interview demonstrations
 
 ---
 
 ## 📝 License
 
-MIT License - feel free to use this project for learning or your portfolio!
+MIT License - Free to use for learning, portfolios, and personal projects.
 
 ---
 
 ## 🙏 Acknowledgments
 
-Built as a portfolio project to demonstrate:
-- Full-stack development (MERN)
-- User authentication with JWT
-- Modern animated UI design
-- **Containerization** (Docker)
-- **Container orchestration** (Kubernetes)
-- DevOps/SRE practices
-- Security best practices
+This project was built from scratch to demonstrate:
+- **Full-stack development** with the MERN stack
+- **DevOps practices** with Docker and Kubernetes
+- **Security best practices** with JWT and bcrypt
+- **Infrastructure as Code** with K8s manifests
+- **Modern UI/UX** with animated components
+- **Real-world application** solving an actual problem
 
-**Perfect for bootcamp grads looking to break into SRE/DevOps roles!** 🚀
+**Perfect for:**
+- Bootcamp graduates entering SRE/DevOps roles
+- Developers learning Kubernetes
+- Portfolio projects demonstrating production-ready skills
+- Interview technical discussions
 
 ---
 
 ## 👤 Author
 
 **Tina Bajwa**  
-Bootcamp Grad + SRE Intern  
-Building real-world projects to showcase DevOps skills
+Bootcamp Graduate + SRE Intern  
+*Building production-ready projects to showcase real-world DevOps skills*
 
 *"Track your tips. Automate your taxes. Deploy with Kubernetes."* 🚀
