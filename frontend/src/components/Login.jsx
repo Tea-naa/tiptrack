@@ -14,7 +14,6 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState("");
   const [expanded, setExpanded] = useState(false);
 
-  // ✅ UPDATED THIS ENTIRE FUNCTION
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -25,10 +24,9 @@ function Login({ onLoginSuccess }) {
     }
 
     try {
-      // Use the login/register functions from api.js instead of fetch
       const data = isSignup 
-        ? await register(username, username, password)  // name, email, password
-        : await login(username, password);  // email, password
+        ? await register(username, password)  
+        : await login(username, password);    
 
       // Store user info
       localStorage.setItem("username", data.user.username);
