@@ -17,11 +17,19 @@ const PORT = process.env.PORT || 5000;  // use PORT from .env, or 5000 as defaul
 
 // ✅ CORS - allows frontend to make requests to backend
 // This single line replaces all the manual header setting!
-app.use(cors());
 // What it does:
 // - Sets 'Access-Control-Allow-Origin: *' (allows all origins)
 // - Handles preflight OPTIONS requests automatically
 // - Sets all the necessary CORS headers
+app.use(cors({
+  origin: [
+    'http://localhost:5173',              // Vite local dev
+    'https://tiptrack.vercel.app',        // Your production URL
+    'https://*.vercel.app'                // Preview deployments
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
