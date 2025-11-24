@@ -5,8 +5,7 @@ import axios from 'axios';
 // BASE URLS
 // =======================
 
-// Main API URL from environment variables (defaults to localhost for development)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = 'https://tiptrack-production-c832.up.railway.app/api/shifts';
 
 // Auth API URL - removes '/shifts' from the end to get the base /api path
 // Example: https://railway.app/api/shifts → https://railway.app/api
