@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, PiggyBank } from "lucide-react";
 import "../styles/Login.css";
+import { login, register } from "../services/api";  
 
 function Login({ onLoginSuccess }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -13,6 +14,7 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState("");
   const [expanded, setExpanded] = useState(false);
 
+  // ✅ UPDATED THIS ENTIRE FUNCTION
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -22,23 +24,21 @@ function Login({ onLoginSuccess }) {
       return;
     }
 
-    const endpoint = isSignup ? "/api/auth/signup" : "/api/auth/login";
-
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      // Use the login/register functions from api.js instead of fetch
+      const data = isSignup 
+        ? await register(username, username, password)  // name, email, password
+        : await login(username, password);  // email, password
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      localStorage.setItem("token", data.token);
+      // Store user info
       localStorage.setItem("username", data.user.username);
+      
+      // Call success callback
       onLoginSuccess(data.user);
+      
     } catch (err) {
-      setError(err.message);
+      // Display error message to user
+      setError(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
@@ -62,32 +62,30 @@ function Login({ onLoginSuccess }) {
         {/* COMPACT STATE (Pill)    */}
         {/* ======================= */}
         
-{!expanded && (
-  <div className="login-compact">
-    <h1 className="compact-title">Login</h1>
+        {!expanded && (
+          <div className="login-compact">
+            <h1 className="compact-title">Login</h1>
 
-    {/* bottom-right tiny badge */}
-    <div className="login-brand-badge compact-brand">
-      <PiggyBank size={14} color="#4ecca3" strokeWidth={2} />
-      <span>TipTrack</span>
-    </div>
-  </div>
-)}
-
+            {/* bottom-right tiny badge */}
+            <div className="login-brand-badge compact-brand">
+              <PiggyBank size={14} color="#4ecca3" strokeWidth={2} />
+              <span>TipTrack</span>
+            </div>
+          </div>
+        )}
 
         {/* ======================= */}
         {/* EXPANDED LOGIN PANEL    */}
         {/* ======================= */}
         {expanded && (
-        <div className="login-inner">
+          <div className="login-inner">
             <header className="login-header">
-            <div className="header-brand">
-            <PiggyBank size={35} color="#4ecca3" strokeWidth={2} />
-            <h1>TipTrack</h1>
-        </div>
-            <p className="header-subtext">Track your tips, plan your taxes.</p>
-        </header>
-
+              <div className="header-brand">
+                <PiggyBank size={35} color="#4ecca3" strokeWidth={2} />
+                <h1>TipTrack</h1>
+              </div>
+              <p className="header-subtext">Track your tips, plan your taxes.</p>
+            </header>
 
             {/* Form */}
             <form className="login-form" onSubmit={handleSubmit}>
@@ -128,7 +126,7 @@ function Login({ onLoginSuccess }) {
               <span>
                 {isSignup
                   ? "Already have an account?"
-                  : "Don’t have an account?"}
+                  : "Don't have an account?"}
               </span>
               <button
                 className="login-toggle"
