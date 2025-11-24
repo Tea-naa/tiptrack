@@ -58,16 +58,15 @@ authApi.interceptors.request.use(config => {
 });
 
 // =======================
-// AUTH API FUNCTIONS (NEW!)
+// AUTH API FUNCTIONS
 // =======================
 
 // Login function - calls /api/auth/login
-export const login = async (email, password) => {
+// Backend expects: { username, password }
+export const login = async (username, password) => {
   try {
-    // authApi has baseURL of /api, so this becomes /api/auth/login
-    const response = await authApi.post('/auth/login', { email, password });
+    const response = await authApi.post('/auth/login', { username, password });
     
-    // Save the JWT token to localStorage for future requests
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
     }
@@ -79,13 +78,12 @@ export const login = async (email, password) => {
   }
 };
 
-// Register function - calls /api/auth/register
-export const register = async (name, email, password) => {
+// Register function - calls /api/auth/signup
+// Backend expects: { username, password }
+export const register = async (username, password) => {
   try {
-    // authApi has baseURL of /api, so this becomes /api/auth/register
-    const response = await authApi.post('/auth/register', { name, email, password });
+    const response = await authApi.post('/auth/signup', { username, password });
     
-    // Save the JWT token to localStorage
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
     }
