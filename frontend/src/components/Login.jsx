@@ -1,5 +1,5 @@
 // =======================
-// LOGIN COMPONENT – PILL → PANEL
+// LOGIN COMPONENT 
 // =======================
 import { useState } from "react";
 import { Eye, EyeOff, PiggyBank } from "lucide-react";
