@@ -11,7 +11,7 @@ function App() {
   // 🔹 STATE VARIABLES
   // ======================================
 
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('shifts'); // ✅ CHANGED: Calendar is now default page
   const [user, setUser] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -117,7 +117,7 @@ function App() {
               className={`nav-btn ${activeTab === 'shifts' ? 'active' : ''}`}
               onClick={() => setActiveTab('shifts')}
             >
-              All Shifts
+              Calendar
             </button>
 
             <button
@@ -162,7 +162,7 @@ function App() {
               setMenuOpen(false);
             }}
           >
-            All Shifts
+            Calendar
           </button>
 
           <button
